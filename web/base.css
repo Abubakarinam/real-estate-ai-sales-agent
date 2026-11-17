@@ -1,0 +1,47 @@
+[hidden] { display: none !important; }
+:root {
+  --navy: #0f2a44;
+  --navy-2: #173a5c;
+  --gold: #c19a4b;
+  --gold-soft: #f4ead6;
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --ink: #142233;
+  --muted: #5d6b7c;
+  --line: #e3e7ed;
+  --hot: #d64545;
+  --hot-bg: #fdecec;
+  --warm: #c77d12;
+  --warm-bg: #fff3df;
+  --cold: #3a6ea5;
+  --cold-bg: #e8f0fa;
+  --ok: #1f8a5b;
+  --ok-bg: #e4f5ec;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(16, 34, 51, .06), 0 4px 16px rgba(16, 34, 51, .06);
+  --font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-ar: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+[dir="rtl"], .ar { font-family: var(--font-ar); }
+a { color: var(--navy-2); }
+button { font: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; color: inherit; }
+.mark { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--navy); color: var(--gold); font-weight: 800; font-size: 13px; letter-spacing: .5px; flex: none; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill.hot { background: var(--hot-bg); color: var(--hot); }
+.pill.warm { background: var(--warm-bg); color: var(--warm); }
+.pill.cold { background: var(--cold-bg); color: var(--cold); }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.grey { background: #eef1f5; color: var(--muted); }
+.pill.navy { background: var(--navy); color: #fff; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: inline-block; }
+.btn { border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 10px; padding: 8px 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.btn:hover { border-color: #c9d1dc; }
+.btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+.btn.primary:hover { background: var(--navy-2); }
+.btn.gold { background: var(--gold); border-color: var(--gold); color: #fff; }
+.btn.small { padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+.btn:disabled { opacity: .5; cursor: default; }
