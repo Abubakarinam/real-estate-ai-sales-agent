@@ -64,7 +64,8 @@ tbody tr:last-child td { border-bottom: 0; }
 .score.warm .num { background: var(--warm-bg); color: var(--warm); }
 .score.cold .num { background: var(--cold-bg); color: var(--cold); }
 .muted { color: var(--muted); }
-.summary-cell { max-width: 320px; color: var(--muted); font-size: 13px; }
+.summary-cell { min-width: 260px; max-width: 340px; color: var(--muted); font-size: 13px; }
+.summary-cell div { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
 .seg { display: inline-flex; background: #eef1f5; border-radius: 10px; padding: 3px; }
 .seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; font-weight: 600; color: var(--muted); }

@@ -23,7 +23,7 @@ Built with **Claude (Anthropic API)**, **LangGraph**, **FastAPI** and **SQLite**
 
 ## Screenshots
 
-These come from real conversations with the agent (see [Recorded demo](#recorded-demo)).
+Every screenshot comes from real conversations with the agent, recorded on 17 November 2026. You can read all 7 chats, unedited, in [docs/sample-conversations.md](docs/sample-conversations.md).
 
 | Customer chat (English) | Customer chat (Arabic) |
 |---|---|
@@ -90,9 +90,9 @@ Then open:
 
 ## Recorded demo
 
-`scripts/demo_conversations.py` runs 7 realistic customers (a family buying a villa, an Arabic-speaking investor, a tenant, an off-plan buyer, someone who wants to negotiate, a browser, an Arabic townhouse buyer) through the real agent, and saves the result to `demo/demo-data.json`.
+`scripts/demo_conversations.py` runs 7 test customers (a family buying a villa, an Arabic-speaking investor, a tenant, an off-plan buyer, someone who wants to negotiate, a browser, an Arabic townhouse buyer) through the real agent, and saves the result to `demo/demo-data.json`.
 
-To see a full dashboard **without an API key**, load that recording:
+The recording from 17 November 2026 is included. To see a full dashboard **without an API key**, load it:
 
 ```bash
 python scripts/demo_data.py load
@@ -120,9 +120,9 @@ python -m pytest -q
 
 The tests use a fake Claude client, so they run offline and cost nothing. They cover a full sales conversation (listings → qualification → booking → hot lead), handoff and staff takeover, AI errors falling back to a human, the login, and the scoring rules.
 
-## Cost
+## Cost and speed
 
-Claude Opus 5.5 at `low` effort with prompt caching. A typical 5-message sales chat uses a few cents of API credit. Token use per conversation is shown on the dashboard.
+Claude Opus 5.5 at `low` effort, with prompt caching. In the recorded demo (7 chats, 28 customer messages), the whole run used about USD 0.43 of API credit, roughly 1.5 US cents per customer message. Replies took 2 to 9 seconds (about 20 seconds for the very first message after start-up). Token use for each conversation is shown on the dashboard.
 
 ## License
 

@@ -31,6 +31,9 @@
   const stagePill = (s) => `<span class="pill ${s === "viewing booked" || s === "won" ? "ok" : s === "handed off" ? "warm" : s === "lost" ? "grey" : "grey"}">${esc(s)}</span>`;
   const convPill = (s) => s === "human" ? `<span class="pill hot">waiting for a human</span>` : s === "closed" ? `<span class="pill grey">closed</span>` : `<span class="pill navy">AI handling</span>`;
   const leadName = (l) => l.name || (l.language === "Arabic" ? "Arabic-speaking visitor" : "Website visitor");
+  // names like "فاطمة الزهراني (Fatima Al-Zahrani)" read correctly left-to-right; pure Arabic stays right-to-left
+  const nameDir = (n) => (/[A-Za-z]/.test(n || "") ? "ltr" : "auto");
+  const beds = (b) => (!b ? "" : /^\d+$/.test(b) ? (b === "0" ? "studio" : b + " bed") : b);
 
   async function api(path, opts = {}) {
     const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...opts });
@@ -99,9 +102,9 @@
         <div class="panel">
           <div class="panel-head"><h2>Best leads right now</h2><a class="right btn small" href="#/leads">All leads</a></div>
           <div class="table-wrap"><table><thead><tr><th>Lead</th><th>Score</th><th>Budget</th><th>Looking for</th><th>Stage</th></tr></thead><tbody>
-          ${s.top_leads.map((l) => `<tr class="click" data-href="#/leads/${l.id}"><td class="name-cell"><strong dir="auto">${esc(leadName(l))}</strong><span>${esc(l.phone || l.language || "")}</span></td>
+          ${s.top_leads.map((l) => `<tr class="click" data-href="#/leads/${l.id}"><td class="name-cell"><strong dir="${nameDir(leadName(l))}">${esc(leadName(l))}</strong><span>${esc(l.phone || l.language || "")}</span></td>
             <td>${scoreBadge(l)}</td><td>${esc(budget(l)) || '<span class="muted">not yet</span>'}</td>
-            <td dir="auto">${esc([l.intent, l.bedrooms && l.bedrooms + " bed", l.property_type, l.areas].filter(Boolean).join(" · "))}</td><td>${stagePill(l.stage)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No leads yet. Open the customer chat and say hello.</td></tr>`}
+            <td dir="auto">${esc([l.intent, beds(l.bedrooms), l.property_type, l.areas].filter(Boolean).join(" · "))}</td><td>${stagePill(l.stage)}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No leads yet. Open the customer chat and say hello.</td></tr>`}
           </tbody></table></div>
         </div>
         <div class="panel">
@@ -148,10 +151,10 @@
         </div>
         <div class="table-wrap"><table><thead><tr><th>Lead</th><th>Score</th><th>Intent</th><th>Budget</th><th>Area</th><th>Timeline</th><th>Financing</th><th>Stage</th><th>Summary</th><th>Updated</th></tr></thead><tbody>
         ${rows.map((l) => `<tr class="click" data-href="#/leads/${l.id}">
-          <td class="name-cell"><strong dir="auto">${esc(leadName(l))}</strong><span>${esc(l.phone || l.email || l.channel)}${l.language ? " · " + esc(l.language) : ""}</span></td>
+          <td class="name-cell"><strong dir="${nameDir(leadName(l))}">${esc(leadName(l))}</strong><span>${esc(l.phone || l.email || l.channel)}${l.language ? " · " + esc(l.language) : ""}</span></td>
           <td>${scoreBadge(l)}</td><td>${esc(l.intent || "")}</td><td>${esc(budget(l))}</td><td dir="auto">${esc(l.areas || "")}</td>
           <td>${esc(l.timeline || "")}</td><td>${esc(l.financing || "")}</td><td>${stagePill(l.stage)}${l.conversation_status === "human" ? ' <span class="pill hot">needs reply</span>' : ""}</td>
-          <td class="summary-cell">${esc(l.summary || "")}</td><td class="muted">${ago(l.updated_at)}</td></tr>`).join("") || `<tr><td colspan="10" class="empty">No leads match.</td></tr>`}
+          <td class="summary-cell"><div title="${esc(l.summary || "")}">${esc(l.summary || "")}</div></td><td class="muted">${ago(l.updated_at)}</td></tr>`).join("") || `<tr><td colspan="10" class="empty">No leads match.</td></tr>`}
         </tbody></table></div>
       </div>`;
     document.querySelectorAll("#seg button").forEach((b) => b.onclick = () => { leadFilter = b.dataset.t; leadsPage(); });
@@ -168,18 +171,18 @@
     const d = await api(`/api/leads/${id}`);
     const l = d.lead, c = d.conversation;
     const field = (label, value) => `<div><span>${label}</span><b dir="auto">${esc(value) || '<span class="muted">—</span>'}</b></div>`;
-    page.innerHTML = head(`<a href="#/leads" style="text-decoration:none;color:var(--muted)">Leads /</a> <span dir="auto">${esc(leadName(l))}</span>`,
+    page.innerHTML = head(`<a href="#/leads" style="text-decoration:none;color:var(--muted)">Leads /</a> <span dir="${nameDir(leadName(l))}">${esc(leadName(l))}</span>`,
       `Started ${ago(c.created_at)} on the ${esc(c.channel)} chat · ${esc(c.language || "")}`,
       `<a class="btn" href="#/conversations/${esc(c.id)}">Open conversation</a>`) + `
       <div class="lead-grid">
         <div class="panel">
           <div class="profile-top">
             <div class="ring" style="--p:${l.score};--c:${TEMP_COLOR[l.temperature]}"><div>${l.score}</div></div>
-            <div><h2 dir="auto">${esc(leadName(l))}</h2>${tempPill(l.temperature)} ${stagePill(l.stage)} ${convPill(c.status)}</div>
+            <div><h2 dir="${nameDir(leadName(l))}">${esc(leadName(l))}</h2>${tempPill(l.temperature)} ${stagePill(l.stage)} ${convPill(c.status)}</div>
           </div>
           <div class="fields">
             ${field("Phone", l.phone)}${field("Email", l.email)}${field("Intent", l.intent)}${field("Language", l.language)}
-            ${field("Budget", budget(l))}${field("Areas", l.areas)}${field("Property", [l.bedrooms && l.bedrooms + " bed", l.property_type].filter(Boolean).join(" "))}
+            ${field("Budget", budget(l))}${field("Areas", l.areas)}${field("Property", [beds(l.bedrooms), l.property_type].filter(Boolean).join(" "))}
             ${field("Timeline", l.timeline)}${field("Financing", l.financing)}${field("Listings", l.interested_listings)}
           </div>
           <div class="block"><h3>AI summary</h3><div>${esc(l.summary || "No summary yet.")}</div></div>
@@ -212,7 +215,7 @@
         <div class="panel conv-list">
           <div class="filters"><div class="seg" id="cseg">${[["", "All"], ["human", "Waiting for a human"], ["ai", "AI handling"]].map(([k, v]) => `<button data-s="${k}" class="${k === convFilter ? "on" : ""}">${v}</button>`).join("")}</div></div>
           ${list.map((c) => `<a class="conv-item ${c.id === id ? "on" : ""}" href="#/conversations/${esc(c.id)}">
-            <div class="top"><strong dir="auto">${esc(c.name || (c.language === "Arabic" ? "Arabic-speaking visitor" : "Website visitor"))}</strong>${c.temperature ? tempPill(c.temperature) : ""}</div>
+            <div class="top"><strong dir="${nameDir(c.name)}">${esc(c.name || (c.language === "Arabic" ? "Arabic-speaking visitor" : "Website visitor"))}</strong>${c.temperature ? tempPill(c.temperature) : ""}</div>
             <div class="top" style="margin-top:4px">${convPill(c.status)}<span class="muted" style="margin-left:auto;font-size:12px">${ago(c.updated_at)}</span></div>
             <div class="last" dir="auto">${esc((c.last_text || "").replace(/\*\*/g, "").replace(/\s+/g, " "))}</div></a>`).join("") || `<div class="empty">No conversations yet.</div>`}
         </div>
@@ -227,7 +230,7 @@
     const [msgs, list] = await Promise.all([api(`/api/chat/${id}/messages`), api(`/api/conversations`)]);
     const c = list.find((x) => x.id === id) || {};
     box.innerHTML = `<div class="panel">
-      <div class="panel-head"><h2 dir="auto">${esc(c.name || "Website visitor")}</h2>${convPill(msgs.status)}
+      <div class="panel-head"><h2 dir="${nameDir(c.name)}">${esc(c.name || "Website visitor")}</h2>${convPill(msgs.status)}
         <div class="right" style="display:flex;gap:6px;flex-wrap:wrap">
           ${c.lead_id ? `<a class="btn small" href="#/leads/${c.lead_id}">Lead profile</a>` : ""}
           ${msgs.status === "ai" ? `<button class="btn small" data-status="human">Take over</button>` : `<button class="btn small primary" data-status="ai">Give back to AI</button>`}
