@@ -21,6 +21,10 @@ def export(path: Path = FILE) -> Path:
     data = {"recorded_at": db.now(), "local_now": datetime.now().strftime("%Y-%m-%dT%H:%M")}
     for t in TABLES:
         data[t] = db.query(f"SELECT * FROM {t} ORDER BY rowid")
+    for conv in data["conversations"]:
+        # the raw Claude history (with signed thinking blocks) is large and only valid for the
+        # account that made it, so the shared recording keeps just the visible messages
+        conv["api_messages"] = "[]"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     return path
@@ -63,6 +67,15 @@ if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
     if cmd == "export":
         print("Wrote", export())
+    elif cmd == "pack":
+        # one-line text version of the recording, handy for copying between machines
+        import base64, gzip
+        print(base64.b64encode(gzip.compress(FILE.read_bytes(), 9)).decode())
+    elif cmd == "unpack":
+        import base64, gzip
+        FILE.parent.mkdir(parents=True, exist_ok=True)
+        FILE.write_bytes(gzip.decompress(base64.b64decode(sys.stdin.read().strip())))
+        print("Wrote", FILE)
     elif cmd == "load":
         load()
     else:
